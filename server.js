@@ -51,7 +51,6 @@ app.listen(PORT, () => {
 app.get("/", (req, res) => {
   res.send(`
     <h1>Medical Dispensing Machine</h1>
-    <p>Server is running successfully ✅</p>
+    <p>Hello this server is running successfully ✅</p>
   `);
-});
-//Rushi Bharade
+});//Rushi Bharade

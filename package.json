@@ -1,0 +1,25 @@
+{
+  "name": "upi_server",
+  "version": "1.0.0",
+  "description": "This repositry if for experimenting with webhook and render server to know the upi transaction happen successfully or not.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ntelectronicsdepartment/UPI_Server.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/ntelectronicsdepartment/UPI_Server/issues"
+  },
+  "homepage": "https://github.com/ntelectronicsdepartment/UPI_Server#readme",
+  "dependencies": {
+    "express": "^5.2.1",
+    "razorpay": "^2.9.6"
+  }
+}

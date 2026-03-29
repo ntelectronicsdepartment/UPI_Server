@@ -54,3 +54,10 @@ app.get("/", (req, res) => {
     <p>Server is running successfully ✅</p>
   `);
 });
+
+const Razorpay = require("razorpay");
+
+const razorpay = new Razorpay({
+  key_id: "rzp_live_SWEsQPmLnQN0Ha",
+  key_secret: "4J4RxWVSWpoeNd30Pk5PhU43",
+});

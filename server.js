@@ -61,3 +61,20 @@ const razorpay = new Razorpay({
   key_id: "rzp_live_SWEsQPmLnQN0Ha",
   key_secret: "4J4RxWVSWpoeNd30Pk5PhU43",
 });
+
+app.get("/create-order", async (req, res) => {
+  try {
+    const options = {
+      amount: 1000, // ₹10 (in paise)
+      currency: "INR",
+      receipt: "receipt_1",
+    };
+
+    const order = await razorpay.orders.create(options);
+    res.json(order);
+
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Error creating order");
+  }
+});

@@ -41,20 +41,6 @@ app.get("/check_payment", (req, res) => {
     });
 });
 
-// ?? Start server
-const PORT = process.env.PORT || process.env.PORT;
-
-app.listen(PORT, () => {
-    console.log("Server running on port", PORT);
-});
-
-app.get("/", (req, res) => {
-  res.send(`
-    <h1>Medical Dispensing Machine</h1>
-    <p>Server is running successfully ✅</p>
-  `);
-});
-
 const Razorpay = require("razorpay");
 
 const razorpay = new Razorpay({
@@ -77,4 +63,18 @@ app.get("/create-order", async (req, res) => {
     console.error(err);
     res.status(500).send("Error creating order");
   }
+});
+
+// ?? Start server
+const PORT = process.env.PORT || process.env.PORT;
+
+app.listen(PORT, () => {
+    console.log("Server running on port", PORT);
+});
+
+app.get("/", (req, res) => {
+  res.send(`
+    <h1>Medical Dispensing Machine</h1>
+    <p>Server is running successfully ✅</p>
+  `);
 });

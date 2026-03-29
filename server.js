@@ -36,3 +36,7 @@ app.get("/create-order", async (req, res) => {
 // Start server
 const PORT = process.env.PORT || process.env.PORT;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+
+const path = require("path");
+
+app.use(express.static(path.join(__dirname, "public")));

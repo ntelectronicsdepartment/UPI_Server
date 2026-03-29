@@ -19,7 +19,7 @@ app.get("/", (req, res) => {
 app.get("/create-order", async (req, res) => {
   try {
     const options = {
-      amount: 10, // ₹10 (in paise)
+      amount: 100, // ₹10 (in paise)
       currency: "INR",
       receipt: "receipt_1",
     };

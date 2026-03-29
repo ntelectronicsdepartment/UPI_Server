@@ -1,3 +1,4 @@
+/*
 const express = require("express");
 const Razorpay = require("razorpay");
 
@@ -14,6 +15,8 @@ const razorpay = new Razorpay({
 app.get("/", (req, res) => {
   res.send("Server is running");
 });
+
+app.use(express.static("public"));
 
 // 👉 STEP 2: Create Order API
 app.get("/create-order", async (req, res) => {
@@ -52,3 +55,32 @@ app.post("/webhook", express.json(), (req, res) => {
 
   res.sendStatus(200);
 });
+
+*/
+const express = require("express");
+const Razorpay = require("razorpay");
+
+const app = express();
+app.use(express.json());
+
+// 👉 THIS LINE IS THE FIX
+app.use(express.static("public"));
+
+const razorpay = new Razorpay({
+  key_id: "rzp_live_SWEsQPmLnQN0Ha",
+  key_secret: "4J4RxWVSWpoeNd30Pk5PhU43",
+});
+
+// Create order
+app.get("/create-order", async (req, res) => {
+  const order = await razorpay.orders.create({
+    amount: 1000,
+    currency: "INR",
+    receipt: "receipt_1",
+  });
+
+  res.json(order);
+});
+
+const PORT = process.env.PORT || process.env.PORT;
+app.listen(PORT, () => console.log("Server running"));

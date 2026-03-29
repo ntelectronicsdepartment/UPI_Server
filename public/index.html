@@ -1,0 +1,25 @@
+<button id="pay">Pay ₹10</button>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+document.getElementById("pay").onclick = async () => {
+  const res = await fetch("/create-order");
+  const order = await res.json();
+
+  const options = {
+    key: "rzp_live_SWEsQPmLnQN0Ha",
+    amount: order.amount,
+    currency: "INR",
+    order_id: order.id,
+
+    handler: function (response) {
+      alert("Payment Successful");
+      console.log(response);
+    }
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
+};
+</script>

@@ -40,3 +40,15 @@ app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
 const path = require("path");
 
 app.use(express.static(path.join(__dirname, "public")));
+
+app.post("/webhook", express.json(), (req, res) => {
+  const event = req.body;
+
+  if (event.event === "payment.captured") {
+    console.log("✅ Payment Successful");
+
+    // 👉 NEXT: trigger ESP32 here
+  }
+
+  res.sendStatus(200);
+});

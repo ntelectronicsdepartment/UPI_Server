@@ -115,6 +115,20 @@ app.use(express.static("public"));
 
 let currentAmount = 1000; // 👈 STEP 1
 
+app.post("/set-amount", express.json(), (req, res) => {
+  const { amount } = req.body;
+
+  if (!amount) {
+    return res.status(400).send("Amount missing");
+  }
+
+  currentAmount = amount;
+
+  console.log("Amount set by ESP32:", amount);
+
+  res.send("OK");
+});
+
 const razorpay = new Razorpay({
   key_id: "rzp_live_SWEsQPmLnQN0Ha",
   key_secret: "4J4RxWVSWpoeNd30Pk5PhU43",

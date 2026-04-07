@@ -113,7 +113,7 @@ const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
-let currentAmount = 1000; // 👈 STEP 1
+let currentAmount = 0; // 👈 STEP 1
 
 app.post("/set-amount", express.json(), (req, res) => {
   const { amount } = req.body;

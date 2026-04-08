@@ -113,7 +113,7 @@ const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
-let currentAmount = 0; // 👈 STEP 1
+let currentAmount = 0; 
 
 app.post("/set-amount", express.json(), (req, res) => {
   const { amount } = req.body;
@@ -130,8 +130,8 @@ app.post("/set-amount", express.json(), (req, res) => {
 });
 
 const razorpay = new Razorpay({
-  key_id: "rzp_live_SWEsQPmLnQN0Ha",
-  key_secret: "4J4RxWVSWpoeNd30Pk5PhU43",
+  key_id: "rzp_test_Sb2jfFoZD648Me",
+  key_secret: "ZqMmWzpGKSyg27LhG99Utqbo",
 });
 
 // 👇 NEW API (ESP32 will call this)

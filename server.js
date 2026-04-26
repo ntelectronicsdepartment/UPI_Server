@@ -105,17 +105,18 @@ app.get("/create-order", async (req, res) => {
 */
 
 // Daynamic Payment on website through ESP32 
-
 const express = require("express");
 const Razorpay = require("razorpay");
 
 const app = express();
+
 app.use(express.json());
 app.use(express.static("public"));
 
-let currentAmount = 0; 
+let currentAmount = 0;
 
-app.post("/set-amount", express.json(), (req, res) => {
+// ✅ ONLY ONE set-amount route
+app.post("/set-amount", (req, res) => {
   const { amount } = req.body;
 
   if (!amount) {
@@ -124,9 +125,13 @@ app.post("/set-amount", express.json(), (req, res) => {
 
   currentAmount = amount;
 
-  console.log("Amount set by ESP32:", amount);
-
+  console.log("Amount set by ESP32:", currentAmount);
   res.send("OK");
+});
+
+// ✅ ADD THIS (VERY IMPORTANT)
+app.get("/get-amount", (req, res) => {
+  res.json({ amount: currentAmount });
 });
 
 const razorpay = new Razorpay({
@@ -134,22 +139,10 @@ const razorpay = new Razorpay({
   key_secret: "4J4RxWVSWpoeNd30Pk5PhU43",
 });
 
-// 👇 NEW API (ESP32 will call this)
-app.post("/set-amount", (req, res) => {
-  const amount = req.body.amount;
-
-  if (!amount) {
-    return res.status(400).send("Amount missing");
-  }
-
-  currentAmount = amount;
-
-  console.log("Amount updated:", currentAmount);
-  res.send("OK");
-});
-
-// 👇 Create order using dynamic amount
+// ✅ Create order
 app.get("/create-order", async (req, res) => {
+  console.log("Using amount:", currentAmount);
+
   const order = await razorpay.orders.create({
     amount: currentAmount,
     currency: "INR",
@@ -159,4 +152,6 @@ app.get("/create-order", async (req, res) => {
   res.json(order);
 });
 
-app.listen(process.env.PORT, () => console.log("Server running"));
+app.listen(process.env.PORT || 3000, () =>
+  console.log("Server running")
+);

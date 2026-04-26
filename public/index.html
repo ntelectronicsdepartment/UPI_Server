@@ -28,7 +28,7 @@ document.getElementById("pay").onclick = async () => {
  <!DOCTYPE html>
 <html>
 <head>
-  <title>Water ATM</title>
+  <title>AISSMS MEDECINE DISPENSING</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <style>
@@ -108,8 +108,10 @@ async function updateAmount() {
 
   const amount = data.amount / 100;
   document.getElementById("amount").innerText = "₹" + amount;
-}
 
+  document.getElementById("pay").innerText = "Pay ₹" + amount;
+}
+updateAmount();
 // run every 2 sec
 setInterval(updateAmount, 2000);
 updateAmount();

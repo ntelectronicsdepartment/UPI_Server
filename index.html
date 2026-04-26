@@ -1,0 +1,144 @@
+<!-- <button id="pay">Pay ₹10</button>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+document.getElementById("pay").onclick = async () => {
+  const res = await fetch("/create-order");
+  const order = await res.json();
+
+  const options = {
+    key: "rzp_live_SWEsQPmLnQN0Ha",
+    amount: order.amount,
+    currency: "INR",
+    order_id: order.id,
+
+    handler: function (response) {
+      alert("Payment Successful");
+      console.log(response);
+    }
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
+};
+</script> -->
+
+<!-- new webpage design-->
+ <!DOCTYPE html>
+<html>
+<head>
+  <title>Water ATM</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <style>
+    body {
+      font-family: Arial;
+      background: #0f172a;
+      color: white;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+
+    .card {
+      background: #1e293b;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      width: 300px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+    }
+
+    h2 {
+      margin-bottom: 10px;
+    }
+
+    #amount {
+      font-size: 32px;
+      margin: 20px 0;
+      color: #38bdf8;
+    }
+
+    button {
+      padding: 12px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background: #22c55e;
+      color: white;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    button:hover {
+      background: #16a34a;
+    }
+
+    #status {
+      margin-top: 15px;
+      font-size: 14px;
+      color: #94a3b8;
+    }
+  </style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>💧 Water ATM</h2>
+
+  <div id="amount">₹10</div>
+
+  <!-- SAME BUTTON -->
+  <button id="pay">Pay Now</button>
+
+  <div id="status">Ready</div>
+</div>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<script>
+// 🔄 Update amount dynamically (NEW)
+async function updateAmount() {
+  const res = await fetch("/get-amount");
+  const data = await res.json();
+
+  const amount = data.amount / 100;
+  document.getElementById("amount").innerText = "₹" + amount;
+}
+
+// run every 2 sec
+setInterval(updateAmount, 2000);
+updateAmount();
+
+
+// 💳 YOUR ORIGINAL PAYMENT LOGIC (UNCHANGED)
+document.getElementById("pay").onclick = async () => {
+
+  document.getElementById("status").innerText = "Processing...";
+
+  const res = await fetch("/create-order");
+  const order = await res.json();
+
+  const options = {
+    key: "rzp_live_SWEsQPmLnQN0Ha",
+    amount: order.amount,
+    currency: "INR",
+    order_id: order.id,
+
+    handler: function (response) {
+      document.getElementById("status").innerText = "✅ Payment Successful";
+      console.log(response);
+    }
+  };
+
+  const rzp = new Razorpay(options);
+  rzp.open();
+};
+</script>
+
+</body>
+</html>

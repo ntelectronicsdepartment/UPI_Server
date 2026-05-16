@@ -103,8 +103,61 @@ app.get("/create-order", async (req, res) => {
   }
 });
 */
+////////////////////////////////working best
+// //Daynamic Payment on website through ESP32 
+// const express = require("express");
+// const Razorpay = require("razorpay");
 
-// Daynamic Payment on website through ESP32 
+// const app = express();
+
+// app.use(express.json());
+// app.use(express.static("public"));
+
+// let currentAmount = 0;
+
+// // ✅ ONLY ONE set-amount route
+// app.post("/set-amount", (req, res) => {
+//   const { amount } = req.body;
+
+//   if (!amount) {
+//     return res.status(400).send("Amount missing");
+//   }
+
+//   currentAmount = amount;
+
+//   console.log("Amount set by ESP32:", currentAmount);
+//   res.send("OK");
+// });
+
+// // ✅ ADD THIS (VERY IMPORTANT)
+// app.get("/get-amount", (req, res) => {
+//   res.json({ amount: currentAmount });
+// });
+
+// const razorpay = new Razorpay({
+//   key_id: "rzp_live_SWEsQPmLnQN0Ha",
+//   key_secret: "4J4RxWVSWpoeNd30Pk5PhU43",
+// });
+
+// // ✅ Create order
+// app.get("/create-order", async (req, res) => {
+//   console.log("Using amount:", currentAmount);
+
+//   const order = await razorpay.orders.create({
+//     amount: currentAmount,
+//     currency: "INR",
+//     receipt: "receipt_" + Date.now(),
+//   });
+
+//   res.json(order);
+// });
+
+// app.listen(process.env.PORT || 3000, () =>
+//   console.log("Server running")
+// );
+
+// Dynamic Payment on website through ESP32
+
 const express = require("express");
 const Razorpay = require("razorpay");
 
@@ -113,10 +166,17 @@ const app = express();
 app.use(express.json());
 app.use(express.static("public"));
 
+// =====================================================
+// VARIABLES
+// =====================================================
 let currentAmount = 0;
+let paymentStatus = "PENDING";
 
-// ✅ ONLY ONE set-amount route
+// =====================================================
+// SET AMOUNT FROM ESP32
+// =====================================================
 app.post("/set-amount", (req, res) => {
+
   const { amount } = req.body;
 
   if (!amount) {
@@ -125,33 +185,96 @@ app.post("/set-amount", (req, res) => {
 
   currentAmount = amount;
 
+  // Reset payment status whenever new amount comes
+  paymentStatus = "PENDING";
+
   console.log("Amount set by ESP32:", currentAmount);
+
   res.send("OK");
 });
 
-// ✅ ADD THIS (VERY IMPORTANT)
+// =====================================================
+// GET CURRENT AMOUNT
+// =====================================================
 app.get("/get-amount", (req, res) => {
-  res.json({ amount: currentAmount });
+
+  res.json({
+    amount: currentAmount
+  });
 });
 
+// =====================================================
+// PAYMENT STATUS API FOR ESP32
+// =====================================================
+app.get("/payment-status", (req, res) => {
+
+  res.send(paymentStatus);
+});
+
+// =====================================================
+// RESET AMOUNT API
+// =====================================================
+app.get("/reset-amount", (req, res) => {
+
+  currentAmount = 0;
+  paymentStatus = "PENDING";
+
+  console.log("System Reset");
+
+  res.send("RESET DONE");
+});
+
+// =====================================================
+// RAZORPAY
+// =====================================================
 const razorpay = new Razorpay({
   key_id: "rzp_live_SWEsQPmLnQN0Ha",
   key_secret: "4J4RxWVSWpoeNd30Pk5PhU43",
 });
 
-// ✅ Create order
+// =====================================================
+// CREATE ORDER
+// =====================================================
 app.get("/create-order", async (req, res) => {
-  console.log("Using amount:", currentAmount);
 
-  const order = await razorpay.orders.create({
-    amount: currentAmount,
-    currency: "INR",
-    receipt: "receipt_" + Date.now(),
-  });
+  try {
 
-  res.json(order);
+    console.log("Using amount:", currentAmount);
+
+    const order = await razorpay.orders.create({
+
+      amount: currentAmount,
+      currency: "INR",
+      receipt: "receipt_" + Date.now(),
+
+    });
+
+    res.json(order);
+
+  } catch (error) {
+
+    console.log(error);
+
+    res.status(500).send("Order creation failed");
+  }
 });
 
-app.listen(process.env.PORT || 3000, () =>
-  console.log("Server running")
-);
+// =====================================================
+// PAYMENT SUCCESS CALLBACK
+// =====================================================
+app.post("/payment-success", (req, res) => {
+
+  paymentStatus = "PAID";
+
+  console.log("PAYMENT SUCCESS");
+
+  res.send("Payment Status Updated");
+});
+
+// =====================================================
+// SERVER START
+// =====================================================
+app.listen(process.env.PORT || 3000, () => {
+
+  console.log("Server running");
+});

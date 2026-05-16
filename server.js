@@ -179,13 +179,13 @@ app.post("/set-amount", (req, res) => {
 
   const { amount } = req.body;
 
-  if (!amount) {
+  if (amount === undefined) {
     return res.status(400).send("Amount missing");
   }
 
   currentAmount = amount;
 
-  // Reset payment status whenever new amount comes
+  // New transaction started
   paymentStatus = "PENDING";
 
   console.log("Amount set by ESP32:", currentAmount);
@@ -208,11 +208,13 @@ app.get("/get-amount", (req, res) => {
 // =====================================================
 app.get("/payment-status", (req, res) => {
 
+  console.log("Payment Status Requested:", paymentStatus);
+
   res.send(paymentStatus);
 });
 
 // =====================================================
-// RESET AMOUNT API
+// RESET SYSTEM
 // =====================================================
 app.get("/reset-amount", (req, res) => {
 
@@ -225,11 +227,13 @@ app.get("/reset-amount", (req, res) => {
 });
 
 // =====================================================
-// RAZORPAY
+// RAZORPAY SETUP
 // =====================================================
 const razorpay = new Razorpay({
+
   key_id: "rzp_live_SWEsQPmLnQN0Ha",
   key_secret: "4J4RxWVSWpoeNd30Pk5PhU43",
+
 });
 
 // =====================================================
@@ -239,7 +243,12 @@ app.get("/create-order", async (req, res) => {
 
   try {
 
-    console.log("Using amount:", currentAmount);
+    console.log("Using Amount:", currentAmount);
+
+    // Prevent 0 Rs order
+    if (currentAmount <= 0) {
+      return res.status(400).send("Invalid Amount");
+    }
 
     const order = await razorpay.orders.create({
 
@@ -255,7 +264,7 @@ app.get("/create-order", async (req, res) => {
 
     console.log(error);
 
-    res.status(500).send("Order creation failed");
+    res.status(500).send("Order Creation Failed");
   }
 });
 
@@ -264,17 +273,37 @@ app.get("/create-order", async (req, res) => {
 // =====================================================
 app.post("/payment-success", (req, res) => {
 
+  console.log("PAYMENT SUCCESS");
+
+  // Payment completed
   paymentStatus = "PAID";
 
-  console.log("PAYMENT SUCCESS");
+  // Immediately reset displayed amount
+  currentAmount = 0;
+
+  console.log("Amount Reset To 0");
 
   res.send("Payment Status Updated");
 });
 
 // =====================================================
+// OPTIONAL STATUS CHECK PAGE
+// =====================================================
+app.get("/", (req, res) => {
+
+  res.send(`
+    <h2>UPI Payment Server Running</h2>
+    <p>Current Amount: ₹${currentAmount / 100}</p>
+    <p>Payment Status: ${paymentStatus}</p>
+  `);
+});
+
+// =====================================================
 // SERVER START
 // =====================================================
-app.listen(process.env.PORT || 3000, () => {
+const PORT = process.env.PORT || 3000;
 
-  console.log("Server running");
+app.listen(PORT, () => {
+
+  console.log("Server running on port", PORT);
 });

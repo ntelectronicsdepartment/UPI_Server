@@ -1,37 +1,13 @@
-<!-- <button id="pay">Pay ₹10</button>
-
-<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-
-<script>
-document.getElementById("pay").onclick = async () => {
-  const res = await fetch("/create-order");
-  const order = await res.json();
-
-  const options = {
-    key: "rzp_live_SWEsQPmLnQN0Ha",
-    amount: order.amount,
-    currency: "INR",
-    order_id: order.id,
-
-    handler: function (response) {
-      alert("Payment Successful");
-      console.log(response);
-    }
-  };
-
-  const rzp = new Razorpay(options);
-  rzp.open();
-};
-</script> -->
-
-<!-- new webpage design-->
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <title>AISSMS MEDECINE DISPENSING</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <meta name="viewport"
+        content="width=device-width, initial-scale=1.0">
 
   <style>
+
     body {
       font-family: Arial;
       background: #0f172a;
@@ -82,64 +58,129 @@ document.getElementById("pay").onclick = async () => {
       font-size: 14px;
       color: #94a3b8;
     }
+
   </style>
 </head>
 
 <body>
 
 <div class="card">
+
   <h2>MEDECINE DISPENSING</h2>
 
-  <div id="amount">₹10</div>
+  <div id="amount">₹0</div>
 
-  <!-- SAME BUTTON -->
   <button id="pay">Pay Now</button>
 
   <div id="status">Ready</div>
+
 </div>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 
 <script>
-// 🔄 Update amount dynamically (NEW)
-async function updateAmount() {
-  const res = await fetch("/get-amount");
-  const data = await res.json();
 
-  const amount = data.amount / 100;
-  document.getElementById("amount").innerText = "₹" + amount;
+  // =====================================================
+  // UPDATE AMOUNT FROM SERVER
+  // =====================================================
+  async function updateAmount() {
 
-  document.getElementById("pay").innerText = "Pay ₹" + amount;
-}
-updateAmount();
-// run every 2 sec
-setInterval(updateAmount, 2000);
-updateAmount();
+    try {
 
+      const res = await fetch("/get-amount");
 
-// 💳 YOUR ORIGINAL PAYMENT LOGIC (UNCHANGED)
-document.getElementById("pay").onclick = async () => {
+      const data = await res.json();
 
-  document.getElementById("status").innerText = "Processing...";
+      const amount = data.amount / 100;
 
-  const res = await fetch("/create-order");
-  const order = await res.json();
+      document.getElementById("amount").innerText =
+        "₹" + amount;
 
-  const options = {
-    key: "rzp_live_SWEsQPmLnQN0Ha",
-    amount: order.amount,
-    currency: "INR",
-    order_id: order.id,
+      document.getElementById("pay").innerText =
+        "Pay ₹" + amount;
 
-    handler: function (response) {
-      document.getElementById("status").innerText = "✅ Payment Successful";
-      console.log(response);
+    } catch (err) {
+
+      console.log(err);
+
+      document.getElementById("status").innerText =
+        "Server Error";
+    }
+  }
+
+  // Initial update
+  updateAmount();
+
+  // Auto refresh every 2 sec
+  setInterval(updateAmount, 2000);
+
+  // =====================================================
+  // PAYMENT BUTTON
+  // =====================================================
+  document.getElementById("pay").onclick = async () => {
+
+    try {
+
+      document.getElementById("status").innerText =
+        "Processing...";
+
+      // Create order
+      const res = await fetch("/create-order");
+
+      const order = await res.json();
+
+      // Razorpay options
+      const options = {
+
+        key: "rzp_live_SWEsQPmLnQN0Ha",
+
+        amount: order.amount,
+
+        currency: "INR",
+
+        order_id: order.id,
+
+        // =========================================
+        // PAYMENT SUCCESS
+        // =========================================
+        handler: async function (response) {
+
+          document.getElementById("status").innerText =
+            "✅ Payment Successful";
+
+          console.log(response);
+
+          // Inform backend
+          const successRes = await fetch("/payment-success", {
+
+            method: "POST"
+
+          });
+
+          const text = await successRes.text();
+
+          console.log(text);
+
+          // Refresh amount immediately
+          updateAmount();
+        }
+
+      };
+
+      // Open Razorpay popup
+      const rzp = new Razorpay(options);
+
+      rzp.open();
+
+    } catch (err) {
+
+      console.log(err);
+
+      document.getElementById("status").innerText =
+        "Payment Failed";
     }
   };
 
-  const rzp = new Razorpay(options);
-  rzp.open();
-};
 </script>
 
 </body>
